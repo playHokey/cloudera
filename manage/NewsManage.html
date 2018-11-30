@@ -1,0 +1,630 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="../assets/plugins/bootstrap-4.0/bootstrap.min.css">
+    <link rel="stylesheet" href="../assets/plugins/font-awesome-4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://fonts.proxy.ustclug.org/css?family=Source+Sans+Pro:300,300i,400,400i,500,500i,600,600i,700,700i&amp;subset=latin-ext">
+    <link rel="stylesheet" href="../assets/plugins/orgchart/jquery.orgchart.min.css">
+    <link rel="stylesheet" href="../assets/plugins/tabler/dashboard.css?v=1">
+    <link rel="stylesheet" href="../assets/plugins/toast/toastr.min.css">
+    <link rel="stylesheet" href="css/newsManage.css?v=2018111601">
+    <title>News Manage - Cloudera</title>
+</head>
+
+<body>
+    <div class="page" id="app">
+
+        <div class="page-main">
+            <div class="header collapse d-flex p-0" id="headerMenuCollapse">
+                <div class="container">
+                    <div class="row align-items-center">
+                        <div class="col-7 order-lg-first">
+                            <ul class="nav nav-tabs border-0 flex-column flex-lg-row">
+                                <li class="nav-item">
+                                    <a href="../companyList.html" class="nav-link"><i class="fe fe-home"></i> Home</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="col-5 ml-auto">
+                            <div class="nav-item pull-right">
+                                <span v-text="username" class="mr-2"></span>
+                                <div class="btn btn-sm btn-outline-primary sign-out" @click="signOut">sign out</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="my-3 my-md-5">
+                <div class="container">
+                    <div class="container">
+                        <div class="page-header">
+                            <h1 class="page-title">
+                                News List
+                            </h1>
+                        </div>
+                        <div class="row row-cards">
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-status card-status-left bg-blue"></div>
+                                    <div class="card-header">
+                                        <h3 class="card-title">Search Conditions</h3>
+                                        <div class="card-options">
+                                            <a href="#" class="card-options-collapse" data-toggle="card-collapse"><i
+                                                    class="fe fe-chevron-up"></i></a>
+                                        </div>
+                                    </div>
+                                    <div class="card-body ">
+                                        <div class="form-group">
+                                            <label class="form-label">Search Title</label>
+                                            <input class="form-control" placeholder="Search for title..." v-model.trim="searchTitle">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Search Account Name</label>
+                                            <input class="form-control" placeholder="Search for account name..."
+                                                v-model.trim="searchAccountName">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label">Search Abstract</label>
+                                            <input class="form-control" placeholder="Search for Abstract..."
+                                                v-model.trim="searchAbstract">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Category</label>
+                                            <div>
+                                                <label class="custom-control custom-checkbox custom-control-inline">
+                                                    <input type="checkbox" class="custom-control-input" name="example-inline-checkbox1"
+                                                        value="Technology News" v-model="newsCategoryArray">
+                                                    <span class="custom-control-label">Technology News</span>
+                                                </label>
+                                                <label class="custom-control custom-checkbox custom-control-inline">
+                                                    <input type="checkbox" class="custom-control-input" name="example-inline-checkbox2"
+                                                        value="Non Tech News" v-model="newsCategoryArray">
+                                                    <span class="custom-control-label">Non Tech News</span>
+                                                </label>
+                                                <label class="custom-control custom-checkbox custom-control-inline">
+                                                    <input type="checkbox" class="custom-control-input" name="example-inline-checkbox3"
+                                                        value="Investment" v-model="newsCategoryArray">
+                                                    <span class="custom-control-label">Investment</span>
+                                                </label>
+                                                <label class="custom-control custom-checkbox custom-control-inline">
+                                                    <input type="checkbox" class="custom-control-input" name="example-inline-checkbox3"
+                                                        value="Marketing events" v-model="newsCategoryArray">
+                                                    <span class="custom-control-label">Marketing events</span>
+                                                </label>
+                                                <label class="custom-control custom-checkbox custom-control-inline">
+                                                    <input type="checkbox" class="custom-control-input" name="example-inline-checkbox3"
+                                                        value="Recruitment" v-model="newsCategoryArray">
+                                                    <span class="custom-control-label">Recruitment</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="form-footer">
+                                            <button class="btn btn-primary btn-block" @click="updateResult">Go!</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Results</h3>
+                                        <div class="card-options">
+                                            <a href="#" class="btn btn-primary btn-sm" id="showAdd" data-target="#modalNewsAdd"
+                                                data-toggle="modal" @click="addNews()">
+                                                <i class="fa fa-plus-circle"></i>
+                                                Add News
+                                            </a>
+
+                                        </div>
+                                    </div>
+                                    <div class="card-body py-1">
+                                        <div class="dimmer " :class="{'active':isLoading}">
+                                            <div class="loader"></div>
+                                            <div class="dimmer-content" v-show="!isLoading && total>0">
+                                                <div class="table-responsive">
+                                                    <table class="table table-hover table-outline table-vcenter  card-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>id</th>
+                                                                <th>account_name</th>
+                                                                <th>title</th>
+                                                                <th>news_type</th>
+                                                                <th></th>
+
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr v-for="item in resultList">
+                                                                <td>
+                                                                    <div v-text="item.id"></div>
+                                                                </td>
+                                                                <td>
+                                                                    <div v-text="item.account_name"></div>
+                                                                </td>
+                                                                <td>
+                                                                    <div v-text="item.title"></div>
+                                                                </td>
+                                                                <td>
+                                                                    <div v-text="item.news_type"></div>
+                                                                </td>
+                                                                <td>
+                                                                    <a class="icon" href="javascript:void(0)" @click="edit(item)"
+                                                                        data-toggle="modal" data-target="#ModalEdit">
+                                                                        <i class="fe fe-edit"></i>
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="no-result" v-show="!isLoading && total==0"> No matching
+                                                companies
+                                                found!
+                                            </div>
+                                            <!-- 编辑内容模态窗 -->
+                                            <div class="modal fade" id="ModalEdit" tabindex="-1" role="dialog"
+                                                aria-labelledby="ModalEditTitle" aria-hidden="true">
+                                                <div class="modal-dialog modal-lg" role="document">
+                                                    <div class="modal-content ">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="ModalEditTitle">Edit News</h5>
+
+                                                        </div>
+                                                        <div class="modal-body modal-body-content">
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label class="form-label">id</label>
+                                                                        <input type="text" class="form-control" v-model="editData.id"
+                                                                            name="example-text-input" disabled="disabled">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label class="form-label">account_id</label>
+                                                                        <input type="text" class="form-control" v-model="editData.account_id"
+                                                                            name="example-text-input" placeholder="Text.."
+                                                                            disabled="disabled">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label class="form-label">editor</label>
+                                                                        <input type="text" class="form-control"
+                                                                            placeholder="none" v-model="editData.editor"
+                                                                            name="example-text-input" disabled="disabled">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label class="form-label">edit_time</label>
+                                                                        <input type="text" class="form-control" v-model="editData.update_time"
+                                                                            name="example-text-input" placeholder="none"
+                                                                            disabled="disabled">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label class="form-label">news_type</label>
+                                                                        <select class="form-control custom-select"
+                                                                            v-model="editData.news_type">
+                                                                            <option value="Technology News">Technology
+                                                                                News</option>
+                                                                            <option value="Non-Tech News">Non-Tech News
+                                                                            </option>
+                                                                            <option value="Investment">Investment</option>
+                                                                            <option value="Marketing events">Marketing
+                                                                                events</option>
+                                                                            <option value="Recruitment">Recruitment</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label class="form-label">keyword</label>
+                                                                        <input type="text" class="form-control" v-model="editData.keyword"
+                                                                            name="example-text-input">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label class="form-label">searchsource</label>
+                                                                        <input type="text" class="form-control" v-model="editData.searchsource"
+                                                                            name="example-text-input">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label class="form-label">publishing_media</label>
+                                                                        <input type="text" class="form-control" v-model="editData.publishing_media"
+                                                                            name="example-text-input">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label class="form-label">account_name</label>
+                                                                        <input type="text" class="form-control" v-model="editData.account_name"
+                                                                            name="example-text-input">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label class="form-label">date</label>
+                                                                        <input type="datetime" name="field-name" class="form-control"
+                                                                            v-model="editData.date">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-8">
+                                                                    <div class="form-group">
+                                                                        <div class="form-label">flag_verify</div>
+                                                                        <div class="custom-controls-stacked">
+                                                                            <label class="custom-control custom-radio custom-control-inline">
+                                                                                <input type="radio" class="custom-control-input"
+                                                                                    name="example-inline-radios" value="1"
+                                                                                    v-model="editData.flag_verify">
+                                                                                <span class="custom-control-label">YES</span>
+                                                                            </label>
+                                                                            <label class="custom-control custom-radio custom-control-inline ">
+                                                                                <input type="radio" class="custom-control-input"
+                                                                                    name="example-inline-radios" value="0"
+                                                                                    v-model="editData.flag_verify">
+                                                                                <span class="custom-control-label">NO</span>
+                                                                            </label>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-12">
+                                                                    <div class="form-group">
+                                                                        <label class="form-label">title</label>
+                                                                        <input type="text" class="form-control" v-model="editData.title"
+                                                                            name="example-text-input">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-12">
+                                                                    <div class="form-group">
+                                                                        <label class="form-label">url_domain</label>
+                                                                        <input type="text" class="form-control" v-model="editData.url_domain"
+                                                                            name="example-text-input">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-12">
+                                                                    <div class="form-group">
+                                                                        <label class="form-label">url</label>
+                                                                        <!-- <label class="form-label">Textarea <span class="form-label-small">56/100</span></label> -->
+                                                                        <textarea class="form-control" name="example-textarea-input"
+                                                                            rows="3" placeholder="Content.." v-model="editData.url"></textarea>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-12">
+                                                                    <div class="form-group">
+                                                                        <label class="form-label">abstract <span class="form-label-small"></span></label>
+                                                                        <textarea class="form-control" name="example-textarea-input"
+                                                                            rows="6" placeholder="Content.." v-model="editData.abstract"></textarea>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                data-dismiss="modal">Close</button>
+                                                            <button type="button" class="btn btn-danger" data-toggle="modal"
+                                                                id="showModal">Delete</button>
+                                                            <button type="button" class="btn btn-primary" @click="saveData()"
+                                                                data-dismiss="modal">Save</button>
+
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- 新增内容模态窗 -->
+                                            <div class="modal fade" id="modalNewsAdd" tabindex="-1" role="dialog"
+                                                aria-labelledby="ModalEditTitle" aria-hidden="true">
+                                                <div class="modal-dialog modal-lg" role="document">
+                                                    <div class="modal-content ">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="ModalAddTitle">Add News</h5>
+
+                                                        </div>
+                                                        <div class="modal-body modal-body-content">
+                                                            <div class="row">
+                                                                <div class="col-md-12">
+                                                                    <div class="form-group">
+                                                                        <label class="form-label">account_id</label>
+                                                                        <input type="text" class="form-control" v-model="addNewsData.account_id"
+                                                                            name="example-text-input" placeholder="Text..">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <!-- <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label class="form-label">editor</label>
+                                                                        <input type="text" class="form-control"
+                                                                            placeholder="none" v-model="addNewsData.editor"
+                                                                            name="example-text-input" disabled="disabled">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label class="form-label">edit_time</label>
+                                                                        <input type="text" class="form-control" v-model="addNewsData.update_time"
+                                                                            name="example-text-input" placeholder="none"
+                                                                            disabled="disabled">
+                                                                    </div>
+                                                                </div>
+                                                            </div> -->
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label class="form-label">news_type</label>
+                                                                        <select class="form-control custom-select"
+                                                                            v-model="addNewsData.news_type">
+                                                                            <option value="Technology News">Technology
+                                                                                News</option>
+                                                                            <option value="Non-Tech News">Non-Tech News
+                                                                            </option>
+                                                                            <option value="Investment">Investment</option>
+                                                                            <option value="Marketing events">Marketing
+                                                                                events</option>
+                                                                            <option value="Recruitment">Recruitment</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label class="form-label">keyword</label>
+                                                                        <input type="text" class="form-control" v-model="addNewsData.keyword"
+                                                                            name="example-text-input">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label class="form-label">searchsource</label>
+                                                                        <input type="text" class="form-control" v-model="addNewsData.searchsource"
+                                                                            name="example-text-input">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label class="form-label">publishing_media</label>
+                                                                        <input type="text" class="form-control" v-model="addNewsData.publishing_media"
+                                                                            name="example-text-input">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-12">
+                                                                    <div class="form-group">
+                                                                        <label class="form-label">account_name</label>
+                                                                        <input type="text" class="form-control" v-model="addNewsData.account_name"
+                                                                            name="example-text-input">
+                                                                    </div>
+                                                                </div>
+                                                                <!-- <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label class="form-label">date</label>
+                                                                        <input type="datetime" name="field-name" class="form-control"
+                                                                            v-model="addNewsData.date">
+                                                                    </div>
+                                                                </div> -->
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-8">
+                                                                    <div class="form-group">
+                                                                        <div class="form-label">flag_verify</div>
+                                                                        <div class="custom-controls-stacked">
+                                                                            <label class="custom-control custom-radio custom-control-inline">
+                                                                                <input type="radio" class="custom-control-input"
+                                                                                    name="example-inline-radios" value="1"
+                                                                                    v-model="addNewsData.flag_verify">
+                                                                                <span class="custom-control-label">YES</span>
+                                                                            </label>
+                                                                            <label class="custom-control custom-radio custom-control-inline ">
+                                                                                <input type="radio" class="custom-control-input"
+                                                                                    name="example-inline-radios" value="0"
+                                                                                    v-model="addNewsData.flag_verify">
+                                                                                <span class="custom-control-label">NO</span>
+                                                                            </label>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-12">
+                                                                    <div class="form-group">
+                                                                        <label class="form-label">title</label>
+                                                                        <input type="text" class="form-control" v-model="addNewsData.title"
+                                                                            name="example-text-input">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-12">
+                                                                    <div class="form-group">
+                                                                        <label class="form-label">url_domain</label>
+                                                                        <input type="text" class="form-control" v-model="addNewsData.url_domain"
+                                                                            name="example-text-input">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-12">
+                                                                    <div class="form-group">
+                                                                        <label class="form-label">url</label>
+                                                                        <!-- <label class="form-label">Textarea <span class="form-label-small">56/100</span></label> -->
+                                                                        <textarea class="form-control" name="example-textarea-input"
+                                                                            rows="3" placeholder="Content.." v-model="addNewsData.url"></textarea>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-12">
+                                                                    <div class="form-group">
+                                                                        <label class="form-label">abstract <span class="form-label-small"></span></label>
+                                                                        <textarea class="form-control" name="example-textarea-input"
+                                                                            rows="6" placeholder="Content.." v-model="addNewsData.abstract"></textarea>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                data-dismiss="modal">Close</button>
+                                                            <button type="button" class="btn btn-danger" @click="ClearData()">Clear</button>
+                                                            <button type="button" class="btn btn-primary" id="showConfirm"
+                                                                data-toggle="modal">Save</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- 确认修改信息窗口 -->
+                                            <div class="modal fade conform-modal" id="confirmDelete">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <!-- 模态框头部 -->
+                                                        <div class="modal-header">
+                                                            <h4 class="modal-title">Warning</h4>
+
+                                                        </div>
+
+                                                        <!-- 模态框主体 -->
+                                                        <div class="modal-body">
+                                                            <h4>Are you sure to delete news ID {{editData.id}}</h4>
+                                                        </div>
+
+                                                        <!-- 模态框底部 -->
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
+                                                            <button type="button" class="btn  btn-danger" data-dismiss="modal"
+                                                                @click="deleteData(editData.id)">Yes</button>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- 确认修添加息窗口 -->
+                                            <div class="modal fade conform-modal" id="confirmAdd">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <!-- 模态框头部 -->
+                                                        <div class="modal-header">
+                                                            <h4 class="modal-title">Warning</h4>
+
+                                                        </div>
+
+                                                        <!-- 模态框主体 -->
+                                                        <div class="modal-body">
+                                                            <h4>Are you sure to add a new record</h4>
+                                                        </div>
+
+                                                        <!-- 模态框底部 -->
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
+                                                            <button type="button" class="btn  btn-danger" data-dismiss="modal"
+                                                                @click="postaddNews()">Yes</button>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer" v-show="!isLoading && total>0">
+                                        <div class="pull-left">
+                                            <div v-text="total" class="mt-1 ml-1 float-left"></div>
+                                            <div v-show="total>1" class="mt-1 ml-1 float-left">results</div>
+                                            <div v-show="total==1" class="mt-1 ml-1 float-left">result</div>
+                                        </div>
+
+                                        <div class="pull-right">
+                                            <ul class="pagination pagination-sm">
+                                                <li class="page-item" @click="setCPage(1)" v-show="totalPage>5">
+                                                    <a class="page-link" href="javascript:void(0)" aria-label="Previous">
+                                                        <span aria-hidden="true">&laquo;</span>
+                                                        <span class="sr-only">Previous</span>
+                                                    </a>
+                                                </li>
+                                                <li v-for="count in totalPage" class="page-item" :class="{'active':currentPage==count}"
+                                                    @click="setCPage(count)" v-show="showCondition(count)">
+                                                    <a class="page-link" href="javascript:void(0)"><span v-text="count"></span></a>
+                                                </li>
+                                                <li class="page-item" @click="setCPage(totalPage)" v-show="totalPage>5">
+                                                    <a class="page-link" href="javascript:void(0)" aria-label="Next">
+                                                        <span aria-hidden="true">&raquo;</span>
+                                                        <span class="sr-only">Next</span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="container">
+                <div class="row align-items-center flex-row-reverse">
+                    <div class="col-12 col-lg-auto mt-3 mt-lg-0 text-center">
+                        Copyright © 2018 <a href="assets/system"> Gomine </a>.&nbsp;All rights reserved.
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+
+    <!-- Optional JavaScript -->
+    <script src="../assets/plugins/polyfill.js" type="text/javascript"></script>
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="../assets/plugins/jquery/jquery.min.js" type="text/javascript"></script>
+    <script src="../assets/plugins/bootstrap-4.0/popper.min.js" type="text/javascript"></script>
+    <script src="../assets/plugins/bootstrap-4.0/bootstrap.min.js" type="text/javascript"></script>
+    <!-- vue-->
+    <script src="../assets/plugins/vue/vue.js" type="text/javascript"></script>
+    <!-- org chart-->
+    <script src="../assets/plugins/orgchart/jquery.orgchart.min.js" type="text/javascript"></script>
+    <!-- tabler-->
+    <script src="../assets/plugins/tabler/core.js" type="text/javascript"></script>
+    <script src="../assets/plugins/toast/toastr.min.js"></script>
+    <!-- customer -->
+    <script src="../assets/js/config.js" type="text/javascript"></script>
+    <script src="js/newsManage.js?v=20181115" type="text/javascript"></script>
+
+</body>
+
+</html>

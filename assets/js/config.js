@@ -1,0 +1,1 @@
+var SERVER_URL="http://www.gomine.cn/sitemap/cloudera/backend/public/";

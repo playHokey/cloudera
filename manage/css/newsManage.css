@@ -1,0 +1,68 @@
+.sign-out {
+    width: 4rem !important;
+    padding: .25rem !important;
+}
+
+.custom-control-inline {
+    width: 180px;
+}
+
+.dimmer {
+    min-height: 100px;
+}
+
+.no-result {
+    display: block;
+    text-align: center;
+    font-size: 1.6rem;
+    padding: 30px;
+}
+
+.block {
+    display: inline-block;
+    border-bottom: 1px solid #ddd;
+    width: 100%;
+    position: relative;
+}
+
+.block:last-child {
+    border-bottom: none;
+}
+
+.block .left {
+    width: 60%;
+    float: left;
+}
+
+.block .right {
+    top: 50%;
+    position: absolute;
+    margin-top: -1rem;
+    right: 3%;
+}
+
+.block .title {
+    font-size: 1.5rem;
+    color: #467fcf;
+}
+
+/* 模态框内容滚动 */
+.modal-body-content {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+#ModalEdit .custom-control-inline {
+    width: auto !important;
+}
+
+
+.conform-modal {
+    margin-top: 10%;
+}
+
+.conform-modal .modal-title,
+.conform-modal .modal-body {
+    color: crimson;
+    text-align: center;
+}

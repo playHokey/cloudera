@@ -1,0 +1,48 @@
+body{
+    overflow: hidden !important;
+}
+#app {
+    background: url("../images/bg.png") no-repeat;
+    height: 100% !important;
+    width: 100%;
+    overflow: hidden;
+    background-size: 100% 100%;
+}
+
+.container{
+    z-index: 2;
+}
+
+.self-title {
+    font-size: 2.5rem;
+    margin-bottom: .5em;
+}
+
+.center-bg {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin-top: -300px;
+    margin-left: -300px;
+    background: url('../images/earth.png') no-repeat 50%;
+    background-size: 100% 100%;
+    width: 600px;
+    height: 600px;
+    z-index: 1;
+    animation: earth-animation 25s linear infinite;
+}
+
+@keyframes earth-animation {
+    0% {
+        transform: rotate(0deg);
+        transform-origin: 50% 50%
+    }
+    50% {
+        transform: rotate(180deg);
+        transform-origin: 50% 50%
+    }
+    to {
+        transform: rotate(1turn);
+        transform-origin: 50% 50%
+    }
+}

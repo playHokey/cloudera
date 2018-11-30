@@ -1,0 +1,68 @@
+.sign-out {
+    width: 4rem !important;
+    padding: .25rem !important;
+}
+
+.custom-control-inline {
+    width: 80px;
+}
+
+.dimmer {
+    min-height: 100px;
+}
+
+.no-result {
+    display: block;
+    text-align: center;
+    font-size: 1.6rem;
+    padding: 30px;
+}
+
+.block {
+    display: inline-block;
+    border-bottom: 1px solid #ddd;
+    width: 100%;
+    position: relative;
+}
+
+.block:last-child {
+    border-bottom: none;
+}
+
+.block .left {
+    width: 60%;
+    float: left;
+}
+
+.block .right {
+    top: 50%;
+    position: absolute;
+    margin-top: -1rem;
+    right: 3%;
+}
+
+.block .title {
+    font-size: 1.5rem;
+    color: #467fcf;
+    cursor: pointer
+;
+}
+
+/*popover*/
+.popover-body {
+    background: #000;
+    color: #fff;
+    font-size: .75rem;
+}
+
+.popover-body a {
+    font-weight: bold;
+    text-decoration: underline;
+    color: #ffffff !important;
+}
+
+.bs-popover-top .arrow::after,
+.bs-popover-auto[x-placement^="top"] .arrow::after {
+    bottom: 1px;
+    border-top-color: #000;
+}
