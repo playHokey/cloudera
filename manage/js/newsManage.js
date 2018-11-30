@@ -4,13 +4,13 @@ $(function() {
 	$('#showModal').click(function() {
 		$('#ModalEdit').modal('hide');
 		$('#confirmDelete').modal('show');
+		$('body').addClass('open-modal');
 	});
 	$('#showAdd').click(function() {
 		$('#Modaladd').modal('show');
 	});
 	$('#showConfirm').click(function() {
 		$('#modalNewsAdd').modal('hide');
-		$('#confirmAdd').modal('show');
 	});
 });
 var app = new Vue({
@@ -47,6 +47,13 @@ var app = new Vue({
 		this.getResultList();
 	},
 	methods: {
+		signOut: function signOut() {
+			sessionStorage.removeItem('username');
+			sessionStorage.removeItem('getData');
+			sessionStorage.removeItem('token');
+			window.location.href = '../login.html';
+		},
+		/*get*/
 		updateResult: function updateResult() {
 			this.currentPage = 1;
 			this.getResultList();
@@ -103,6 +110,7 @@ var app = new Vue({
 				},
 			});
 		},
+		/*page */
 		setCPage: function setCPage(page) {
 			this.currentPage = page;
 			this.getResultList();
@@ -119,17 +127,12 @@ var app = new Vue({
 				else return false;
 			}
 		},
-		edit: function goDetail(item) {
+		/*edit */
+		edit: function edit(item) {
 			let vm = this;
 			vm.editData = item;
 		},
-		signOut: function signOut() {
-			sessionStorage.removeItem('username');
-			sessionStorage.removeItem('getData');
-			sessionStorage.removeItem('token');
-			window.location.href = '../login.html';
-		},
-		saveData() {
+		editNewsData: function editNewsData() {
 			var _this = this;
 			$.ajax({
 				type: 'post',
@@ -174,59 +177,7 @@ var app = new Vue({
 				},
 			});
 		},
-		addNews() {
-			var _this = this;
-			$(function() {
-				$('#showAdd').click(function() {
-					$('#Modaladd').show('show');
-				});
-			});
-			_this.addNewsData = {};
-		},
-		postaddNews() {
-			var _this = this;
-			$.ajax({
-				type: 'post',
-				data: {
-					account_id: _this.addNewsData.account_id,
-					news_type: _this.addNewsData.news_type,
-					keyword: _this.addNewsData.keyword,
-					searchsource: _this.addNewsData.searchsource,
-					publishing_media: _this.addNewsData.publishing_media,
-					account_name: _this.addNewsData.account_name,
-					flag_verify: _this.addNewsData.flag_verify,
-					title: _this.addNewsData.title,
-					url_domain: _this.addNewsData.url_domain,
-					url: _this.addNewsData.url,
-					abstract: _this.addNewsData.abstract,
-					editor: sessionStorage.getItem('username'),
-				},
-				dataType: 'json',
-				url: SERVER_URL + 'api/content/addnews',
-				beforeSend: function(xhr) {
-					// 先验证token
-					xhr.setRequestHeader('token', sessionStorage.getItem('token'));
-				},
-				success: function(res) {
-					if (res.status == 1) {
-						window.location.reload();
-						toastr.success('Add successfully');
-					} else {
-						toastr.info('Add failed');
-					}
-				},
-				complete: function() {
-					$('#submit').removeAttr('disabled');
-				},
-				error: function(data) {
-					toastr.warning('Unknown error.Please reload and try again');
-				},
-			});
-		},
-		ClearData() {
-			this.addNewsData = {};
-		},
-		deleteData(id) {
+		editDeleteData: function deleteData(id) {
 			var _this = this;
 			$('#ModalEdit').hide();
 
@@ -256,6 +207,66 @@ var app = new Vue({
 					toastr.warning('Unknown error.Please reload and try again');
 				},
 			});
+		},
+		editNewsShowModal() {
+			$('#ModalEdit').modal('show');
+			$('body').addClass('open-modal');
+		},
+		/*addNews */
+		addNews: function addNews() {
+			var _this = this;
+			$(function() {
+				$('#showAdd').click(function() {
+					$('#Modaladd').show('show');
+				});
+			});
+		},
+		addNewsPost: function addNewsPost() {
+			var _this = this;
+			$.ajax({
+				type: 'post',
+				data: {
+					account_id: _this.addNewsData.account_id,
+					news_type: _this.addNewsData.news_type,
+					keyword: _this.addNewsData.keyword,
+					searchsource: _this.addNewsData.searchsource,
+					publishing_media: _this.addNewsData.publishing_media,
+					account_name: _this.addNewsData.account_name,
+					flag_verify: _this.addNewsData.flag_verify,
+					title: _this.addNewsData.title,
+					url_domain: _this.addNewsData.url_domain,
+					url: _this.addNewsData.url,
+					abstract: _this.addNewsData.abstract,
+					editor: sessionStorage.getItem('username'),
+				},
+				dataType: 'json',
+				url: SERVER_URL + 'api/content/addnews',
+				beforeSend: function(xhr) {
+					// 先验证token
+					xhr.setRequestHeader('token', sessionStorage.getItem('token'));
+				},
+				success: function(res) {
+					if (res.status == 1) {
+						_this.$nextTick(function() {
+							window.location.reload();
+							setTimeout(function() {
+								toastr.success('Add successfully');
+							}, 4000);
+						});
+					} else {
+						toastr.info('Add failed');
+					}
+				},
+				complete: function() {
+					$('#submit').removeAttr('disabled');
+				},
+				error: function(data) {
+					toastr.warning('Unknown error.Please reload and try again');
+				},
+			});
+		},
+		addNewsClearData: function addNewsClearData() {
+			this.addNewsData = {};
 		},
 	},
 });

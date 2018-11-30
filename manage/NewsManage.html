@@ -148,11 +148,12 @@
                                                                     <div v-text="item.id"></div>
                                                                 </td>
                                                                 <td>
-                                                                    <div v-text="item.account_name"></div>
-                                                                </td>
-                                                                <td>
                                                                     <div v-text="item.title"></div>
                                                                 </td>
+                                                                <td>
+                                                                    <div v-text="item.account_name"></div>
+                                                                </td>
+
                                                                 <td>
                                                                     <div v-text="item.news_type"></div>
                                                                 </td>
@@ -174,7 +175,7 @@
                                             <!-- 编辑内容模态窗 -->
                                             <div class="modal fade" id="ModalEdit" tabindex="-1" role="dialog"
                                                 aria-labelledby="ModalEditTitle" aria-hidden="true">
-                                                <div class="modal-dialog modal-lg" role="document">
+                                                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
                                                     <div class="modal-content ">
                                                         <div class="modal-header">
                                                             <h5 class="modal-title" id="ModalEditTitle">Edit News</h5>
@@ -337,7 +338,7 @@
                                                                 data-dismiss="modal">Close</button>
                                                             <button type="button" class="btn btn-danger" data-toggle="modal"
                                                                 id="showModal">Delete</button>
-                                                            <button type="button" class="btn btn-primary" @click="saveData()"
+                                                            <button type="button" class="btn btn-primary" @click="editNewsData()"
                                                                 data-dismiss="modal">Save</button>
 
 
@@ -348,7 +349,7 @@
                                             <!-- 新增内容模态窗 -->
                                             <div class="modal fade" id="modalNewsAdd" tabindex="-1" role="dialog"
                                                 aria-labelledby="ModalEditTitle" aria-hidden="true">
-                                                <div class="modal-dialog modal-lg" role="document">
+                                                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
                                                     <div class="modal-content ">
                                                         <div class="modal-header">
                                                             <h5 class="modal-title" id="ModalAddTitle">Add News</h5>
@@ -501,9 +502,9 @@
                                                         <div class="modal-footer">
                                                             <button type="button" class="btn btn-secondary"
                                                                 data-dismiss="modal">Close</button>
-                                                            <button type="button" class="btn btn-danger" @click="ClearData()">Clear</button>
+                                                            <button type="button" class="btn btn-danger" @click="addNewsClearData()">Clear</button>
                                                             <button type="button" class="btn btn-primary" id="showConfirm"
-                                                                data-toggle="modal">Save</button>
+                                                                data-toggle="modal" @click="addNewsPost()">Save</button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -525,39 +526,17 @@
 
                                                         <!-- 模态框底部 -->
                                                         <div class="modal-footer">
-                                                            <button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
+                                                            <button type="button" class="btn btn-primary" data-dismiss="modal"
+                                                                @click="editNewsShowModal">No</button>
                                                             <button type="button" class="btn  btn-danger" data-dismiss="modal"
-                                                                @click="deleteData(editData.id)">Yes</button>
+                                                                @click="editDeleteData(editData.id)">Yes</button>
                                                         </div>
 
                                                     </div>
                                                 </div>
                                             </div>
-                                            <!-- 确认修添加息窗口 -->
-                                            <div class="modal fade conform-modal" id="confirmAdd">
-                                                <div class="modal-dialog">
-                                                    <div class="modal-content">
-                                                        <!-- 模态框头部 -->
-                                                        <div class="modal-header">
-                                                            <h4 class="modal-title">Warning</h4>
+                                            <!-- 确认添加息窗口 -->
 
-                                                        </div>
-
-                                                        <!-- 模态框主体 -->
-                                                        <div class="modal-body">
-                                                            <h4>Are you sure to add a new record</h4>
-                                                        </div>
-
-                                                        <!-- 模态框底部 -->
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
-                                                            <button type="button" class="btn  btn-danger" data-dismiss="modal"
-                                                                @click="postaddNews()">Yes</button>
-                                                        </div>
-
-                                                    </div>
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
                                     <div class="card-footer" v-show="!isLoading && total>0">
