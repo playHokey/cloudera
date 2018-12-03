@@ -1,15 +1,15 @@
 'use strict';
 
-$(function() {
-	$('#showModal').click(function() {
+$(function () {
+	$('#showModal').click(function () {
 		$('#ModalEdit').modal('hide');
 		$('#confirmDelete').modal('show');
 		$('body').addClass('open-modal');
 	});
-	$('#showAdd').click(function() {
+	$('#showAdd').click(function () {
 		$('#Modaladd').modal('show');
 	});
-	$('#showConfirm').click(function() {
+	$('#showConfirm').click(function () {
 		$('#modalNewsAdd').modal('hide');
 	});
 });
@@ -155,11 +155,11 @@ var app = new Vue({
 				},
 				dataType: 'json',
 				url: SERVER_URL + 'api/content/save',
-				beforeSend: function(xhr) {
+				beforeSend: function (xhr) {
 					// 先验证token
 					xhr.setRequestHeader('token', sessionStorage.getItem('token'));
 				},
-				success: function(res) {
+				success: function (res) {
 					if (res.status == 1) {
 						toastr.success('Modified successfully');
 						_this.getResultList();
@@ -169,10 +169,10 @@ var app = new Vue({
 						toastr.warning('Failure to modify without permission');
 					}
 				},
-				complete: function() {
+				complete: function () {
 					$('#submit').removeAttr('disabled');
 				},
-				error: function(data) {
+				error: function (data) {
 					toastr.warning('Unknown error.Please reload and try again');
 				},
 			});
@@ -183,7 +183,7 @@ var app = new Vue({
 
 			$.ajax({
 				url: SERVER_URL + 'api/content/delete',
-				beforeSend: function(xhr) {
+				beforeSend: function (xhr) {
 					// 先验证token
 					xhr.setRequestHeader('token', sessionStorage.getItem('token'));
 				},
@@ -215,55 +215,61 @@ var app = new Vue({
 		/*addNews */
 		addNews: function addNews() {
 			var _this = this;
-			$(function() {
-				$('#showAdd').click(function() {
+			$(function () {
+				$('#showAdd').click(function () {
 					$('#Modaladd').show('show');
 				});
 			});
 		},
 		addNewsPost: function addNewsPost() {
 			var _this = this;
-			$.ajax({
-				type: 'post',
-				data: {
-					account_id: _this.addNewsData.account_id,
-					news_type: _this.addNewsData.news_type,
-					keyword: _this.addNewsData.keyword,
-					searchsource: _this.addNewsData.searchsource,
-					publishing_media: _this.addNewsData.publishing_media,
-					account_name: _this.addNewsData.account_name,
-					flag_verify: _this.addNewsData.flag_verify,
-					title: _this.addNewsData.title,
-					url_domain: _this.addNewsData.url_domain,
-					url: _this.addNewsData.url,
-					abstract: _this.addNewsData.abstract,
-					editor: sessionStorage.getItem('username'),
-				},
-				dataType: 'json',
-				url: SERVER_URL + 'api/content/addnews',
-				beforeSend: function(xhr) {
-					// 先验证token
-					xhr.setRequestHeader('token', sessionStorage.getItem('token'));
-				},
-				success: function(res) {
-					if (res.status == 1) {
-						_this.$nextTick(function() {
-							window.location.reload();
-							setTimeout(function() {
-								toastr.success('Add successfully');
-							}, 4000);
-						});
-					} else {
-						toastr.info('Add failed');
-					}
-				},
-				complete: function() {
-					$('#submit').removeAttr('disabled');
-				},
-				error: function(data) {
-					toastr.warning('Unknown error.Please reload and try again');
-				},
-			});
+			if (JSON.stringify(_this.addNewsData) !== "{}") {
+
+
+				$.ajax({
+					type: 'post',
+					data: {
+						account_id: _this.addNewsData.account_id,
+						news_type: _this.addNewsData.news_type,
+						keyword: _this.addNewsData.keyword,
+						searchsource: _this.addNewsData.searchsource,
+						publishing_media: _this.addNewsData.publishing_media,
+						account_name: _this.addNewsData.account_name,
+						flag_verify: _this.addNewsData.flag_verify,
+						title: _this.addNewsData.title,
+						url_domain: _this.addNewsData.url_domain,
+						url: _this.addNewsData.url,
+						abstract: _this.addNewsData.abstract,
+						editor: sessionStorage.getItem('username'),
+					},
+					dataType: 'json',
+					url: SERVER_URL + 'api/content/addnews',
+					beforeSend: function (xhr) {
+						// 先验证token
+						xhr.setRequestHeader('token', sessionStorage.getItem('token'));
+					},
+					success: function (res) {
+						if (res.status == 1) {
+							_this.$nextTick(function () {
+								window.location.reload();
+								setTimeout(function () {
+									toastr.success('Add successfully');
+								}, 4000);
+							});
+						} else {
+							toastr.info('Add failed');
+						}
+					},
+					complete: function () {
+						$('#submit').removeAttr('disabled');
+					},
+					error: function (data) {
+						toastr.warning('Unknown error.Please reload and try again');
+					},
+				});
+			} else {
+				toastr.info("Please fill at least one item of the form ")
+			}
 		},
 		addNewsClearData: function addNewsClearData() {
 			this.addNewsData = {};
